@@ -908,3 +908,33 @@ export const PROJECT_ROLE = {
     projectSlug: "The slug of the project to list the roles of."
   }
 };
+
+export const CONSUMER_SECRETS = {
+  GET: {
+    orgId: "The ID of the organization to retrieve consumer secrets for.",
+    id: "The unique identifier of the consumer secret.",
+    userId: "The ID of the user who owns the consumer secret.",
+    organizationId: "The ID of the organization that the consumer secret belongs to.",
+    title: "The title of the consumer secret.",
+    type: "The type of the consumer secret.",
+    data: "The encrypted data of the consumer secret.",
+    comment: "An optional comment for the consumer secret."
+  },
+  POST: {
+    title: "The title of the new consumer secret.",
+    type: "The type of the new consumer secret.",
+    data: "The encrypted data of the new consumer secret.",
+    comment: "An optional comment for the new consumer secret.",
+    id: "The unique identifier of the newly created consumer secret."
+  },
+  PUT: {
+    id: "The unique identifier of the consumer secret to update.",
+    title: "The new title of the consumer secret.",
+    type: "The new type of the consumer secret.",
+    data: "The new encrypted data of the consumer secret.",
+    comment: "An optional new comment for the consumer secret."
+  },
+  DELETE: {
+    id: "The unique identifier of the consumer secret to delete."
+  }
+};

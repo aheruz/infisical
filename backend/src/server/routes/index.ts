@@ -167,6 +167,8 @@ import { userAliasDALFactory } from "@app/services/user-alias/user-alias-dal";
 import { userEngagementServiceFactory } from "@app/services/user-engagement/user-engagement-service";
 import { webhookDALFactory } from "@app/services/webhook/webhook-dal";
 import { webhookServiceFactory } from "@app/services/webhook/webhook-service";
+import { consumerSecretsDALFactory } from "@app/services/consumer-secrets/consumer-secrets-dal";
+import { consumerSecretsServiceFactory } from "@app/services/consumer-secrets/consumer-secrets-service";
 
 import { injectAuditLogInfo } from "../plugins/audit-log";
 import { injectIdentity } from "../plugins/auth/inject-identity";
@@ -927,6 +929,12 @@ export const registerRoutes = async (
     userDAL
   });
 
+  const consumerSecretsDAL = consumerSecretsDALFactory(db);
+  const consumerSecretsService = consumerSecretsServiceFactory({
+    consumerSecretsDAL,
+    orgBotDAL
+  });
+
   await superAdminService.initServerCfg();
   //
   // setup the communication with license key server
@@ -999,7 +1007,8 @@ export const registerRoutes = async (
     projectUserAdditionalPrivilege: projectUserAdditionalPrivilegeService,
     identityProjectAdditionalPrivilege: identityProjectAdditionalPrivilegeService,
     secretSharing: secretSharingService,
-    userEngagement: userEngagementService
+    userEngagement: userEngagementService,
+    consumerSecrets: consumerSecretsService
   });
 
   const cronJobs: CronJob[] = [];

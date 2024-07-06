@@ -67,6 +67,7 @@ import { TUserDALFactory } from "@app/services/user/user-dal";
 import { TUserServiceFactory } from "@app/services/user/user-service";
 import { TUserEngagementServiceFactory } from "@app/services/user-engagement/user-engagement-service";
 import { TWebhookServiceFactory } from "@app/services/webhook/webhook-service";
+import { TConsumerSecretsServiceFactory } from "@app/services/consumer-secrets/consumer-secrets-service";
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -159,6 +160,7 @@ declare module "fastify" {
       secretSharing: TSecretSharingServiceFactory;
       rateLimit: TRateLimitServiceFactory;
       userEngagement: TUserEngagementServiceFactory;
+      consumerSecrets: TConsumerSecretsServiceFactory;
     };
     // this is exclusive use for middlewares in which we need to inject data
     // everywhere else access using service layer

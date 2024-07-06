@@ -3,6 +3,7 @@ import { registerAuthRoutes } from "./auth-router";
 import { registerProjectBotRouter } from "./bot-router";
 import { registerCaRouter } from "./certificate-authority-router";
 import { registerCertRouter } from "./certificate-router";
+import { registerConsumerSecretsRouter } from "./consumer-secrets-router";
 import { registerIdentityAccessTokenRouter } from "./identity-access-token-router";
 import { registerIdentityAwsAuthRouter } from "./identity-aws-iam-auth-router";
 import { registerIdentityAzureAuthRouter } from "./identity-azure-auth-router";
@@ -79,4 +80,5 @@ export const registerV1Routes = async (server: FastifyZodProvider) => {
   await server.register(registerIdentityRouter, { prefix: "/identities" });
   await server.register(registerSecretSharingRouter, { prefix: "/secret-sharing" });
   await server.register(registerUserEngagementRouter, { prefix: "/user-engagement" });
+  await server.register(registerConsumerSecretsRouter, { prefix: "/consumer-secrets" });
 };
