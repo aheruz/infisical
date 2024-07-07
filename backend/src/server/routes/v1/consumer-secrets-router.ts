@@ -1,11 +1,11 @@
 import { z } from "zod";
+
+import { CONSUMER_SECRETS } from "@app/lib/api-docs";
+import { readLimit, writeLimit } from "@app/server/config/rateLimiter";
 import { verifyAuth } from "@app/server/plugins/auth/verify-auth";
 import { AuthMode } from "@app/services/auth/auth-type";
-import { readLimit, writeLimit } from "@app/server/config/rateLimiter";
-import { CONSUMER_SECRETS } from "@app/lib/api-docs";
 
 export const registerConsumerSecretsRouter = async (server: FastifyZodProvider) => {
-
   server.route({
     method: "GET",
     url: "/",
@@ -18,19 +18,21 @@ export const registerConsumerSecretsRouter = async (server: FastifyZodProvider) 
         orgId: z.string().trim().describe(CONSUMER_SECRETS.GET.orgId)
       }),
       response: {
-        200: z.array(z.object({
-          id: z.string().describe(CONSUMER_SECRETS.GET.id),
-          userId: z.string().describe(CONSUMER_SECRETS.GET.userId),
-          organizationId: z.string().describe(CONSUMER_SECRETS.GET.organizationId),
-          title: z.string().describe(CONSUMER_SECRETS.GET.title),
-          type: z.string().describe(CONSUMER_SECRETS.GET.type),
-          data: z.string().describe(CONSUMER_SECRETS.GET.data),
-          comment: z.string().optional().describe(CONSUMER_SECRETS.GET.comment)
-        }))
+        200: z.array(
+          z.object({
+            id: z.string().describe(CONSUMER_SECRETS.GET.id),
+            userId: z.string().describe(CONSUMER_SECRETS.GET.userId),
+            organizationId: z.string().describe(CONSUMER_SECRETS.GET.organizationId),
+            title: z.string().describe(CONSUMER_SECRETS.GET.title),
+            type: z.string().describe(CONSUMER_SECRETS.GET.type),
+            data: z.string().describe(CONSUMER_SECRETS.GET.data),
+            comment: z.string().optional().describe(CONSUMER_SECRETS.GET.comment)
+          })
+        )
       }
     },
     onRequest: verifyAuth([AuthMode.JWT]),
-    handler: async (req) => {  
+    handler: async (req) => {
       const secrets = await server.services.consumerSecrets.findAllOrganizationCustomerSecrets(
         req.permission.orgId,
         req.permission.id

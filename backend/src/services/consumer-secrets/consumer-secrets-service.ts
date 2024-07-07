@@ -1,12 +1,13 @@
-import { TConsumerSecretsDALFactory } from "./consumer-secrets-dal";
-import { TConsumerSecretsInsert } from "@app/db/schemas";
-import { encryptSymmetric128BitHexKeyUTF8, decryptSymmetric128BitHexKeyUTF8 } from "@app/lib/crypto";
-import { TOrgBotDALFactory } from "@app/services/org/org-bot-dal";
-import { SecretKeyEncoding } from "@app/db/schemas";
-import { BadRequestError } from "@app/lib/errors";
-import { infisicalSymmetricDecrypt } from "@app/lib/crypto/encryption";
-import { TCreateConsumerSecret } from "./consumer-secrets-types";
 import { v4 as uuidv4 } from "uuid";
+
+import { SecretKeyEncoding, TConsumerSecretsInsert } from "@app/db/schemas";
+import { decryptSymmetric128BitHexKeyUTF8, encryptSymmetric128BitHexKeyUTF8 } from "@app/lib/crypto";
+import { infisicalSymmetricDecrypt } from "@app/lib/crypto/encryption";
+import { BadRequestError } from "@app/lib/errors";
+import { TOrgBotDALFactory } from "@app/services/org/org-bot-dal";
+
+import { TConsumerSecretsDALFactory } from "./consumer-secrets-dal";
+import { TCreateConsumerSecret } from "./consumer-secrets-types";
 
 type TConsumerSecretsServiceFactoryDep = {
   consumerSecretsDAL: TConsumerSecretsDALFactory;
@@ -44,30 +45,33 @@ export const consumerSecretsServiceFactory = ({ consumerSecretsDAL, orgBotDAL }:
       title: decryptFieldWithSymmetricKey(secret.titleCiphertext, secret.titleIV, secret.titleTag, encryptionKey),
       type: decryptFieldWithSymmetricKey(secret.typeCiphertext, secret.typeIV, secret.typeTag, encryptionKey),
       data: decryptFieldWithSymmetricKey(secret.dataCiphertext, secret.dataIV, secret.dataTag, encryptionKey),
-      comment: decryptFieldWithSymmetricKey(secret.commentCiphertext, secret.commentIV, secret.commentTag, encryptionKey)
+      comment: decryptFieldWithSymmetricKey(
+        secret.commentCiphertext,
+        secret.commentIV,
+        secret.commentTag,
+        encryptionKey
+      )
     };
   };
 
   const findAllOrganizationCustomerSecrets = async (orgId: string, userId: string) => {
     const secrets = await consumerSecretsDAL.findAllOrganizationCustomerSecrets(orgId, userId);
     const encryptionKey = await getOrgBotKey(orgId);
-    return secrets.map(secret => ({
+    return secrets.map((secret) => ({
       ...secret,
       title: decryptFieldWithSymmetricKey(secret.titleCiphertext, secret.titleIV, secret.titleTag, encryptionKey),
       type: decryptFieldWithSymmetricKey(secret.typeCiphertext, secret.typeIV, secret.typeTag, encryptionKey),
       data: decryptFieldWithSymmetricKey(secret.dataCiphertext, secret.dataIV, secret.dataTag, encryptionKey),
-      comment: decryptFieldWithSymmetricKey(secret.commentCiphertext, secret.commentIV, secret.commentTag, encryptionKey)
+      comment: decryptFieldWithSymmetricKey(
+        secret.commentCiphertext,
+        secret.commentIV,
+        secret.commentTag,
+        encryptionKey
+      )
     }));
   };
 
-  const createConsumerSecret = async ({
-    title,
-    type,
-    data,
-    comment,
-    orgId,
-    userId
-  }: TCreateConsumerSecret) => {
+  const createConsumerSecret = async ({ title, type, data, comment, orgId, userId }: TCreateConsumerSecret) => {
     const encryptionKey = await getOrgBotKey(orgId);
     const titleEncrypted = encryptSymmetric128BitHexKeyUTF8(title, encryptionKey);
     const typeEncrypted = encryptSymmetric128BitHexKeyUTF8(type, encryptionKey);

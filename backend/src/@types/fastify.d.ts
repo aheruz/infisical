@@ -34,6 +34,7 @@ import { ActorAuthMethod, ActorType } from "@app/services/auth/auth-type";
 import { TAuthTokenServiceFactory } from "@app/services/auth-token/auth-token-service";
 import { TCertificateServiceFactory } from "@app/services/certificate/certificate-service";
 import { TCertificateAuthorityServiceFactory } from "@app/services/certificate-authority/certificate-authority-service";
+import { TConsumerSecretsServiceFactory } from "@app/services/consumer-secrets/consumer-secrets-service";
 import { TGroupProjectServiceFactory } from "@app/services/group-project/group-project-service";
 import { TIdentityServiceFactory } from "@app/services/identity/identity-service";
 import { TIdentityAccessTokenServiceFactory } from "@app/services/identity-access-token/identity-access-token-service";
@@ -67,7 +68,6 @@ import { TUserDALFactory } from "@app/services/user/user-dal";
 import { TUserServiceFactory } from "@app/services/user/user-service";
 import { TUserEngagementServiceFactory } from "@app/services/user-engagement/user-engagement-service";
 import { TWebhookServiceFactory } from "@app/services/webhook/webhook-service";
-import { TConsumerSecretsServiceFactory } from "@app/services/consumer-secrets/consumer-secrets-service";
 
 declare module "fastify" {
   interface FastifyRequest {

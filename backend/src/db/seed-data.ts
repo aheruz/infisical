@@ -134,9 +134,9 @@ export const generateOrgBotSrpKeys = async () => {
     iv: publicKeyIV,
     tag: publicKeyTag
   } = encryptSymmetric128BitHexKeyUTF8(publicKey, key);
-  
+
   return {
-    publicKey,  
+    publicKey,
     encryptedPrivateKey,
     privateKeyIV,
     privateKeyTag,

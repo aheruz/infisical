@@ -5,8 +5,6 @@
 
 import { z } from "zod";
 
-
-
 import { TImmutableDBKeys } from "./models";
 
 export const ConsumerSecretsSchema = z.object({
@@ -25,8 +23,8 @@ export const ConsumerSecretsSchema = z.object({
   commentCiphertext: z.string(),
   commentIV: z.string(),
   commentTag: z.string(),
-  algorithm: z.string().default('aes-256-gcm'),
-  keyEncoding: z.string().default('utf8'),
+  algorithm: z.string().default("aes-256-gcm"),
+  keyEncoding: z.string().default("utf8"),
   createdAt: z.date(),
   updatedAt: z.date()
 });

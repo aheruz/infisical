@@ -86,6 +86,8 @@ import { certificateAuthorityDALFactory } from "@app/services/certificate-author
 import { certificateAuthorityQueueFactory } from "@app/services/certificate-authority/certificate-authority-queue";
 import { certificateAuthoritySecretDALFactory } from "@app/services/certificate-authority/certificate-authority-secret-dal";
 import { certificateAuthorityServiceFactory } from "@app/services/certificate-authority/certificate-authority-service";
+import { consumerSecretsDALFactory } from "@app/services/consumer-secrets/consumer-secrets-dal";
+import { consumerSecretsServiceFactory } from "@app/services/consumer-secrets/consumer-secrets-service";
 import { groupProjectDALFactory } from "@app/services/group-project/group-project-dal";
 import { groupProjectMembershipRoleDALFactory } from "@app/services/group-project/group-project-membership-role-dal";
 import { groupProjectServiceFactory } from "@app/services/group-project/group-project-service";
@@ -167,8 +169,6 @@ import { userAliasDALFactory } from "@app/services/user-alias/user-alias-dal";
 import { userEngagementServiceFactory } from "@app/services/user-engagement/user-engagement-service";
 import { webhookDALFactory } from "@app/services/webhook/webhook-dal";
 import { webhookServiceFactory } from "@app/services/webhook/webhook-service";
-import { consumerSecretsDALFactory } from "@app/services/consumer-secrets/consumer-secrets-dal";
-import { consumerSecretsServiceFactory } from "@app/services/consumer-secrets/consumer-secrets-service";
 
 import { injectAuditLogInfo } from "../plugins/audit-log";
 import { injectIdentity } from "../plugins/auth/inject-identity";

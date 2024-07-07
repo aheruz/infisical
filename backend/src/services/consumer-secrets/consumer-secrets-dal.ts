@@ -1,4 +1,5 @@
 import { Knex } from "knex";
+
 import { TDbClient } from "@app/db";
 import { TableName, TConsumerSecretsInsert } from "@app/db/schemas";
 import { DatabaseError } from "@app/lib/errors";
@@ -11,9 +12,7 @@ export const consumerSecretsDALFactory = (db: TDbClient) => {
 
   const findCustomerSecretById = async (id: string, tx?: Knex) => {
     try {
-      const secret = await (tx || db.replicaNode())(TableName.ConsumerSecrets)
-        .where({ id })
-        .first();
+      const secret = await (tx || db.replicaNode())(TableName.ConsumerSecrets).where({ id }).first();
       return secret;
     } catch (error) {
       throw new DatabaseError({ error, name: "FindCustomerSecretById" });
@@ -37,7 +36,7 @@ export const consumerSecretsDALFactory = (db: TDbClient) => {
     try {
       const [secret] = await (tx || db)(TableName.ConsumerSecrets)
         .insert(data)
-        .onConflict('id') // check for conflicts
+        .onConflict("id") // check for conflicts
         .merge() // update the existing row on conflict
         .returning("*");
       return secret;
@@ -48,10 +47,7 @@ export const consumerSecretsDALFactory = (db: TDbClient) => {
 
   const deleteConsumerSecret = async (id: string, tx?: Knex) => {
     try {
-      const [secret] = await (tx || db)(TableName.ConsumerSecrets)
-        .where({ id })
-        .delete()
-        .returning("*");
+      const [secret] = await (tx || db)(TableName.ConsumerSecrets).where({ id }).delete().returning("*");
       return secret;
     } catch (error) {
       throw new DatabaseError({ error, name: "DeleteConsumerSecret" });
