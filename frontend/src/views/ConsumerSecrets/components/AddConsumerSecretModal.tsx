@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Modal, ModalContent } from "@app/components/v2";
-import { useTimedReset } from "@app/hooks";
 import { UsePopUpState } from "@app/hooks/usePopUp";
 import { AddConsumerSecretForm } from "./AddConsumerSecretForm";
 import { credentialConfig } from "./CredentialConfig";
 import { ConsumerSecretType } from "./types";
+import { TDecryptedConsumerSecret } from "@app/hooks/api/consumerSecrets/types";
 
 type Props = {
   popUp: UsePopUpState<ConsumerSecretType[]>;
@@ -18,9 +18,9 @@ type Props = {
 
 export const AddConsumerSecretModal = ({ popUp, handlePopUpToggle }: Props) => {
 
-    const openPopUpKey = Object.keys(popUp).find(
-        (key): key is keyof UsePopUpState<ConsumerSecretType[]> => popUp[key as keyof UsePopUpState<ConsumerSecretType[]>].isOpen
-    );
+  const openPopUpKey = Object.keys(popUp).find(
+    (key): key is keyof UsePopUpState<ConsumerSecretType[]> => popUp[key as keyof UsePopUpState<ConsumerSecretType[]>].isOpen
+  );
 
   const getConfigAndSchema = (key: keyof UsePopUpState<ConsumerSecretType[]>) => {
     const config = credentialConfig[key as keyof typeof credentialConfig];
@@ -45,6 +45,8 @@ export const AddConsumerSecretModal = ({ popUp, handlePopUpToggle }: Props) => {
   });
 
   const [isSecretInputDisabled, setIsSecretInputDisabled] = useState(false);
+  console.log(popUp);
+  const isEditMode = popUp[openPopUpKey as keyof UsePopUpState<ConsumerSecretType[]>].data?.isEditMode;
 
   useEffect(() => {
     const currentModalType = openPopUpKey as keyof UsePopUpState<ConsumerSecretType[]>;
@@ -57,12 +59,12 @@ export const AddConsumerSecretModal = ({ popUp, handlePopUpToggle }: Props) => {
     }
   }, [popUp[openPopUpKey as keyof UsePopUpState<ConsumerSecretType[]>].data]);
 
-  const onSubmit = async () => {
+  const onSubmit = async (formData: any) => {
     handlePopUpToggle(openPopUpKey, false);
   };
 
   return (
-    <Modal
+    <Modal  
       isOpen={popUp[openPopUpKey]?.isOpen}
       onOpenChange={(open) => {
         handlePopUpToggle(openPopUpKey, open);
@@ -70,7 +72,7 @@ export const AddConsumerSecretModal = ({ popUp, handlePopUpToggle }: Props) => {
       }}
     >
       <ModalContent
-        title={config.title}
+        title={isEditMode ? `Edit ${config.title}` : config.title}
         subTitle={config.description}
       >
         <AddConsumerSecretForm
@@ -78,8 +80,10 @@ export const AddConsumerSecretModal = ({ popUp, handlePopUpToggle }: Props) => {
           handleSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           isInputDisabled={isSecretInputDisabled}
-          onSubmit={onSubmit}
+          onSubmit={() => handleSubmit(onSubmit)()}
           fields={config.fields}
+          isEditMode={isEditMode}
+          initialData={popUp[openPopUpKey as keyof UsePopUpState<ConsumerSecretType[]>]?.data?.initialData}
         />
       </ModalContent>
     </Modal>

@@ -18,7 +18,7 @@ import { ConsumerSecretsRow } from "./ConsumerSecretsRow";
 
 type Props = {
   handlePopUpOpen: (
-    popUpName: keyof UsePopUpState<["deleteSharedSecretConfirmation"]>,
+    popUpName: keyof UsePopUpState<["deleteConsumerSecretConfirmation"]>,
     {
       name,
       id
@@ -41,7 +41,6 @@ export const ConsumerSecretsTable = ({ handlePopUpOpen }: Props) => {
             <Th>Secret Name</Th>
             <Th>Type</Th>
             <Th>Comment</Th>
-            <Th>Data</Th>
             <Th aria-label="button" />
           </Tr>
         </THead>

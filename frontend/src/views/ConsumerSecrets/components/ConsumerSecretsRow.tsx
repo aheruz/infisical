@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faTrashCan, faPencil } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { IconButton, Td, Tr } from "@app/components/v2";
@@ -74,13 +74,17 @@ export const ConsumerSecretsRow = ({
 }: {
   row: TDecryptedConsumerSecret;
   handlePopUpOpen: (
-    popUpName: keyof UsePopUpState<["deleteSharedSecretConfirmation"]>,
+    popUpName: keyof UsePopUpState<any>,
     {
       name,
-      id
+      id,
+      initialData,
+      isEditMode
     }: {
       name: string;
       id: string;
+      initialData?: TDecryptedConsumerSecret;
+      isEditMode?: boolean;
     }
   ) => void;
 }) => {
@@ -99,11 +103,25 @@ export const ConsumerSecretsRow = ({
       <Td>{row.title}</Td>
       <Td>{row.type}</Td>
       <Td>{row.comment}</Td>
-      <Td>{row.data}</Td>
       <Td>
         <IconButton
+            onClick={() =>
+              handlePopUpOpen(row.type, {
+                name: "edit",
+                id: row.id,
+                isEditMode: true,
+                initialData: row
+              })
+            }
+            colorSchema="secondary"
+            ariaLabel="edit"
+            style={{ marginRight: '8px' }}
+          >
+          <FontAwesomeIcon icon={faPencil} />
+        </IconButton>
+        <IconButton
           onClick={() =>
-            handlePopUpOpen("deleteSharedSecretConfirmation", {
+            handlePopUpOpen("deleteConsumerSecretConfirmation", {
               name: "delete",
               id: row.id
             })

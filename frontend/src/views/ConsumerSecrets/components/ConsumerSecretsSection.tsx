@@ -17,20 +17,21 @@ export const ConsumerSecretsSection = () => {
     "weblogin",
     "creditcard",
     "securenote",
-    "deleteSharedSecretConfirmation"
+    "deleteConsumerSecretConfirmation",
+    "editConsumerSecret"
   ] as const);
 
   const onDeleteApproved = async () => {
     try {
       deleteConsumerSecret.mutateAsync({
-        id: (popUp?.deleteSharedSecretConfirmation?.data as DeleteModalData)?.id
+        id: (popUp?.deleteConsumerSecretConfirmation?.data as DeleteModalData)?.id
       });
       createNotification({
         text: "Successfully deleted shared secret",
         type: "success"
       });
 
-      handlePopUpClose("deleteSharedSecretConfirmation");
+      handlePopUpClose("deleteConsumerSecretConfirmation");
     } catch (err) {
       console.error(err);
       createNotification({
@@ -58,13 +59,13 @@ export const ConsumerSecretsSection = () => {
         handlePopUpToggle={handlePopUpToggle}
       />
       <DeleteActionModal
-        isOpen={popUp.deleteSharedSecretConfirmation.isOpen}
+        isOpen={popUp.deleteConsumerSecretConfirmation.isOpen}
         title={`Delete ${
-          (popUp?.deleteSharedSecretConfirmation?.data as DeleteModalData)?.name || " "
+          (popUp?.deleteConsumerSecretConfirmation?.data as DeleteModalData)?.name || " "
         } consumer secret?`}
-        onChange={(isOpen) => handlePopUpToggle("deleteSharedSecretConfirmation", isOpen)}
-        deleteKey={(popUp?.deleteSharedSecretConfirmation?.data as DeleteModalData)?.name}
-        onClose={() => handlePopUpClose("deleteSharedSecretConfirmation")}
+        onChange={(isOpen) => handlePopUpToggle("deleteConsumerSecretConfirmation", isOpen)}
+        deleteKey={(popUp?.deleteConsumerSecretConfirmation?.data as DeleteModalData)?.name}
+        onClose={() => handlePopUpClose("deleteConsumerSecretConfirmation")}
         onDeleteApproved={onDeleteApproved}
       />
     </div>

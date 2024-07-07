@@ -35,6 +35,7 @@ export const useUpdateConsumerSecret = ({
   const queryClient = useQueryClient();
   return useMutation<{}, {}, TUpdateConsumerSecretsDTO>({
     mutationFn: async (dto) => {
+        console.log("UPDATE", dto);
       const { data } = await apiRequest.put(`/api/v1/consumer-secrets/${dto.id}`, dto);
       return data;
     },

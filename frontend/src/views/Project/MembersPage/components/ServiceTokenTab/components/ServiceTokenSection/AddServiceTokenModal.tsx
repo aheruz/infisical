@@ -115,7 +115,7 @@ export const AddServiceTokenModal = ({ popUp, handlePopUpToggle }: Props) => {
 
     return () => clearTimeout(timer);
   }, [isTokenCopied]);
-
+  
   const copyTokenToClipboard = () => {
     navigator.clipboard.writeText(newToken);
     setIsTokenCopied.on();

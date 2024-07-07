@@ -36,7 +36,7 @@ const AddConsumerSecretButton = ({ handlePopUpOpen }: Props) => {
                     colorSchema="primary"
                     leftIcon={<FontAwesomeIcon icon={faPlus} />}
                 >
-                    Share Secret
+                    Add Secret
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="p-1">

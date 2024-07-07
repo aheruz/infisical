@@ -8,16 +8,14 @@ export const credentialConfig = {
       title: yup.string().max(255).required().label("Title"),
       type: yup.string().default("weblogin").label("Type"),
       comment: yup.string().max(1000).label("Comment"),
-      name: yup.string().max(255).required().label("Secret Name"),
       username: yup.string().max(255).required().label("Username"),
       password: yup.string().max(255).required().label("Password")
     }),
     fields: [
       { name: "title", label: "Title", type: "text" },
-      { name: "comment", label: "Comment", type: "text" },
-      { name: "name", label: "Secret Name", type: "text" },
       { name: "username", label: "Username", type: "text" },
-      { name: "password", label: "Password", type: "password" }
+      { name: "password", label: "Password", type: "password" },
+      { name: "comment", label: "Comment", type: "text" },
     ]
   },
   creditcard: {
@@ -33,10 +31,10 @@ export const credentialConfig = {
     }),
     fields: [
       { name: "title", label: "Title", type: "text" },
-      { name: "comment", label: "Comment", type: "text" },
       { name: "cardNumber", label: "Card Number", type: "text" },
       { name: "expiryDate", label: "Expiry Date", type: "text" },
-      { name: "cvv", label: "CVV", type: "password" }
+      { name: "cvv", label: "CVV", type: "password" },
+      { name: "comment", label: "Comment", type: "text" },
     ]
   },
   securenote: {
@@ -50,8 +48,8 @@ export const credentialConfig = {
     }),
     fields: [
       { name: "title", label: "Title", type: "text" },
+      { name: "note", label: "Note", type: "textarea" },
       { name: "comment", label: "Comment", type: "text" },
-      { name: "note", label: "Note", type: "textarea" }
     ]
   }
 };
