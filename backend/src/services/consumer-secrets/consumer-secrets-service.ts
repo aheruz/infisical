@@ -1,9 +1,7 @@
-import { v4 as uuidv4 } from "uuid";
-
-import { SecretKeyEncoding, TConsumerSecrets, TConsumerSecretsInsert } from "@app/db/schemas";
+import { SecretKeyEncoding, TConsumerSecrets } from "@app/db/schemas";
 import { decryptSymmetric128BitHexKeyUTF8, encryptSymmetric128BitHexKeyUTF8 } from "@app/lib/crypto";
 import { infisicalSymmetricDecrypt } from "@app/lib/crypto/encryption";
-import { BadRequestError, UnauthorizedError } from "@app/lib/errors";
+import { BadRequestError } from "@app/lib/errors";
 import { TOrgBotDALFactory } from "@app/services/org/org-bot-dal";
 
 import { TConsumerSecretsDALFactory } from "./consumer-secrets-dal";
@@ -55,15 +53,27 @@ export const consumerSecretsServiceFactory = ({ consumerSecretsDAL, orgBotDAL }:
   const findAllOrganizationCustomerSecrets = async (orgId: string, userId: string) => {
     const secrets = await consumerSecretsDAL.findAllOrganizationCustomerSecrets(orgId, userId);
     const encryptionKey = await getOrgBotKey(orgId);
-    return Promise.all(secrets.map(async (secret) => ({
-      id: secret.id,
-      userId: secret.userId,
-      orgId: secret.orgId,
-      title: await decryptFieldWithSymmetricKey(secret.titleCiphertext, secret.titleIV, secret.titleTag, encryptionKey),
-      type: await decryptFieldWithSymmetricKey(secret.typeCiphertext, secret.typeIV, secret.typeTag, encryptionKey),
-      data: await decryptFieldWithSymmetricKey(secret.dataCiphertext, secret.dataIV, secret.dataTag, encryptionKey),
-      comment: await decryptFieldWithSymmetricKey(secret.commentCiphertext, secret.commentIV, secret.commentTag, encryptionKey)
-    })));
+    return Promise.all(
+      secrets.map(async (secret) => ({
+        id: secret.id,
+        userId: secret.userId,
+        orgId: secret.orgId,
+        title: await decryptFieldWithSymmetricKey(
+          secret.titleCiphertext,
+          secret.titleIV,
+          secret.titleTag,
+          encryptionKey
+        ),
+        type: await decryptFieldWithSymmetricKey(secret.typeCiphertext, secret.typeIV, secret.typeTag, encryptionKey),
+        data: await decryptFieldWithSymmetricKey(secret.dataCiphertext, secret.dataIV, secret.dataTag, encryptionKey),
+        comment: await decryptFieldWithSymmetricKey(
+          secret.commentCiphertext,
+          secret.commentIV,
+          secret.commentTag,
+          encryptionKey
+        )
+      }))
+    );
   };
 
   const createConsumerSecret = async ({ title, type, data, comment, orgId, userId }: TCreateConsumerSecretDTO) => {
@@ -113,23 +123,23 @@ export const consumerSecretsServiceFactory = ({ consumerSecretsDAL, orgBotDAL }:
       ...(titleEncrypted && {
         titleCiphertext: titleEncrypted.ciphertext,
         titleIV: titleEncrypted.iv,
-        titleTag: titleEncrypted.tag,
+        titleTag: titleEncrypted.tag
       }),
       ...(typeEncrypted && {
         typeCiphertext: typeEncrypted.ciphertext,
         typeIV: typeEncrypted.iv,
-        typeTag: typeEncrypted.tag,
+        typeTag: typeEncrypted.tag
       }),
       ...(dataEncrypted && {
         dataCiphertext: dataEncrypted.ciphertext,
         dataIV: dataEncrypted.iv,
-        dataTag: dataEncrypted.tag,
+        dataTag: dataEncrypted.tag
       }),
       ...(commentEncrypted && {
         commentCiphertext: commentEncrypted.ciphertext,
         commentIV: commentEncrypted.iv,
-        commentTag: commentEncrypted.tag,
-      }),
+        commentTag: commentEncrypted.tag
+      })
     };
 
     return consumerSecretsDAL.updateConsumerSecrets(id, encryptedData);

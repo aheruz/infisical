@@ -30,7 +30,7 @@ export const registerConsumerSecretsRouter = async (server: FastifyZodProvider) 
     },
     onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN]),
     handler: async (req) => {
-      return await server.services.consumerSecrets.findAllOrganizationCustomerSecrets(
+      return server.services.consumerSecrets.findAllOrganizationCustomerSecrets(
         req.permission.orgId,
         req.permission.id
       );
@@ -59,7 +59,7 @@ export const registerConsumerSecretsRouter = async (server: FastifyZodProvider) 
       }
     },
     handler: async (req) => {
-      return await server.services.consumerSecrets.findConsumerSecretById(req.params.id, req.permission.orgId);
+      return server.services.consumerSecrets.findConsumerSecretById(req.params.id, req.permission.orgId);
     }
   });
 
@@ -88,7 +88,7 @@ export const registerConsumerSecretsRouter = async (server: FastifyZodProvider) 
         })
       }
     },
-    onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN], ),
+    onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN]),
     handler: async (req) => {
       const { title, type, data, comment } = req.body;
       const newSecret = await server.services.consumerSecrets.createConsumerSecret({
@@ -160,7 +160,7 @@ export const registerConsumerSecretsRouter = async (server: FastifyZodProvider) 
     handler: async (req, res) => {
       const { id } = req.params;
       await server.services.consumerSecrets.deleteConsumerSecret(id);
-      res.status(204).send();
+      void res.status(204).send();
     }
   });
 };

@@ -34,9 +34,7 @@ export const consumerSecretsDALFactory = (db: TDbClient) => {
 
   const createConsumerSecret = async (data: TConsumerSecretsInsert, tx?: Knex) => {
     try {
-      const [secret] = await (tx || db)(TableName.ConsumerSecrets)
-        .insert(data)
-        .returning("*");
+      const [secret] = await (tx || db)(TableName.ConsumerSecrets).insert(data).returning("*");
       return secret;
     } catch (error) {
       throw new DatabaseError({ error, name: "CreateConsumerSecret" });
@@ -45,10 +43,7 @@ export const consumerSecretsDALFactory = (db: TDbClient) => {
 
   const updateConsumerSecrets = async (id: string, data: TConsumerSecretsUpdate, tx?: Knex) => {
     try {
-      const [secret] = await (tx || db)(TableName.ConsumerSecrets)
-        .where({ id })
-        .update(data)
-        .returning("*");
+      const [secret] = await (tx || db)(TableName.ConsumerSecrets).where({ id }).update(data).returning("*");
       return secret;
     } catch (error) {
       throw new DatabaseError({ error, name: "UpsertConsumerSecrets" });
