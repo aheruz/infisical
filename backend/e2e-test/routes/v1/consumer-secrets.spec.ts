@@ -30,6 +30,33 @@ const deleteConsumerSecret = async (id: string) => {
   expect(res.body).toEqual("");
 };
 
+const updateConsumerSecret = async (id: string, dto: { title?: string; type?: string; data?: string; comment?: string }) => {
+  const res = await testServer.inject({
+    method: "PUT",
+    url: `/api/v1/consumer-secrets/${id}`,
+    headers: {
+      authorization: `Bearer ${jwtAuthToken}`
+    },
+    body: dto
+  });
+  expect(res.statusCode).toBe(200);
+  expect(res.json().id).toEqual(id);
+  return res.json();
+};
+
+const getConsumerSecret = async (id: string) => {
+  const res = await testServer.inject({
+    method: "GET",
+    url: `/api/v1/consumer-secrets/${id}`,
+    headers: {
+      authorization: `Bearer ${jwtAuthToken}`
+    }
+  });
+  expect(res.statusCode).toBe(200);
+  expect(res.json().id).toEqual(id);
+  return res.json();
+};
+
 describe("Consumer Secrets Router", async () => {
     test.each([
         { title: "secret1", type: "type1", data: "data1" },
@@ -62,43 +89,24 @@ describe("Consumer Secrets Router", async () => {
     });
 });
 
+test("Update consumer secret", async () => {
+  const createdSecretId = await createConsumerSecret({ title: "secret-to-update", type: "type1", data: "data1" });
+  await updateConsumerSecret(createdSecretId, { title: "updated-secret", type: "updated-type", data: "updated-data" });
+  const updatedSecret = await getConsumerSecret(createdSecretId);
+  expect(updatedSecret.title).toEqual("updated-secret");
+  expect(updatedSecret.type).toEqual("updated-type");
+  expect(updatedSecret.data).toEqual("updated-data");
+  expect(updatedSecret.comment).toEqual("");
+  await deleteConsumerSecret(createdSecretId);
+});
 
-//   test("Update a consumer secret", async () => {
-//     const createdSecretId = await createConsumerSecret({ title: "secret-to-update", type: "type1", data: "data1" });
-
-//     const res = await testServer.inject({
-//       method: "PUT",
-//       url: `/api/v1/consumer-secrets/${createdSecretId}`,
-//       headers: {
-//         authorization: `Bearer ${jwtAuthToken}`
-//       },
-//       body: {
-//         title: "updated-secret",
-//         type: "updated-type",
-//         data: "updated-data"
-//       }
-//     });
-
-//     expect(res.statusCode).toBe(200);
-//     const updatedSecretId = res.json().id;
-//     expect(updatedSecretId).toEqual(createdSecretId);
-
-//     await deleteConsumerSecret(updatedSecretId);
-//   });
-
-//   test("Delete a consumer secret", async () => {
-//     const createdSecretId = await createConsumerSecret({ title: "secret-to-delete", type: "type1", data: "data1" });
-
-//     const res = await testServer.inject({
-//       method: "DELETE",
-//       url: `/api/v1/consumer-secrets/${createdSecretId}`,
-//       headers: {
-//         authorization: `Bearer ${jwtAuthToken}`
-//       }
-//     });
-
-//     expect(res.statusCode).toBe(200);
-//     const deletedSecretId = res.json().id;
-//     expect(deletedSecretId).toEqual(createdSecretId);
-//   });
-// });
+test("Update consumer secret comment", async () => {
+  const createdSecretId = await createConsumerSecret({ title: "secret-to-update", type: "type1", data: "data1" });
+  await updateConsumerSecret(createdSecretId, { comment: "updated-comment" });
+  const updatedSecret = await getConsumerSecret(createdSecretId);
+  expect(updatedSecret.title).toEqual("secret-to-update");
+  expect(updatedSecret.type).toEqual("type1");
+  expect(updatedSecret.data).toEqual("data1");
+  expect(updatedSecret.comment).toEqual("updated-comment");
+  await deleteConsumerSecret(createdSecretId);
+});
