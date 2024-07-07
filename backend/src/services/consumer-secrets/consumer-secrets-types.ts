@@ -1,4 +1,4 @@
-export type TCreateConsumerSecret = {
+export type TCreateConsumerSecretDTO = {
   title: string;
   type: string;
   data: string;
@@ -11,6 +11,6 @@ export type TUpdateConsumerSecret = {
   id: string;
   title?: string;
   type?: string;
-  data?: Record<string, any>;
+  data?: string;
   comment?: string;
 };

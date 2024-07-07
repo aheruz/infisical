@@ -7,7 +7,7 @@ import { BadRequestError } from "@app/lib/errors";
 import { TOrgBotDALFactory } from "@app/services/org/org-bot-dal";
 
 import { TConsumerSecretsDALFactory } from "./consumer-secrets-dal";
-import { TCreateConsumerSecret } from "./consumer-secrets-types";
+import { TCreateConsumerSecretDTO } from "./consumer-secrets-types";
 
 type TConsumerSecretsServiceFactoryDep = {
   consumerSecretsDAL: TConsumerSecretsDALFactory;
@@ -71,7 +71,7 @@ export const consumerSecretsServiceFactory = ({ consumerSecretsDAL, orgBotDAL }:
     }));
   };
 
-  const createConsumerSecret = async ({ title, type, data, comment, orgId, userId }: TCreateConsumerSecret) => {
+  const createConsumerSecret = async ({ title, type, data, comment, orgId, userId }: TCreateConsumerSecretDTO) => {
     const encryptionKey = await getOrgBotKey(orgId);
     const titleEncrypted = encryptSymmetric128BitHexKeyUTF8(title, encryptionKey);
     const typeEncrypted = encryptSymmetric128BitHexKeyUTF8(type, encryptionKey);
@@ -95,9 +95,7 @@ export const consumerSecretsServiceFactory = ({ consumerSecretsDAL, orgBotDAL }:
       commentTag: commentEncrypted.tag
     };
 
-    console.log("encryptedData", encryptedData);
-
-    return consumerSecretsDAL.upsertConsumerSecrets(encryptedData);
+    return consumerSecretsDAL.createConsumerSecret(encryptedData);
   };
 
   const upsertConsumerSecrets = async (data: TConsumerSecretsInsert, orgId: string, userId: string) => {
