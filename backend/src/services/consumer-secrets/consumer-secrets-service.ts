@@ -36,19 +36,19 @@ export const consumerSecretsServiceFactory = ({ consumerSecretsDAL, orgBotDAL }:
     return decryptSymmetric128BitHexKeyUTF8({ ciphertext, iv, tag, key });
   };
 
-  const decryptSecretFields = (secret: TConsumerSecrets, key: Buffer) => ({
-    title: decryptFieldWithSymmetricKey(secret.titleCiphertext, secret.titleIV, secret.titleTag, key),
-    type: decryptFieldWithSymmetricKey(secret.typeCiphertext, secret.typeIV, secret.typeTag, key),
-    data: decryptFieldWithSymmetricKey(secret.dataCiphertext, secret.dataIV, secret.dataTag, key),
-    comment: decryptFieldWithSymmetricKey(secret.commentCiphertext, secret.commentIV, secret.commentTag, key)
+  const decryptSecretFields = async (secret: TConsumerSecrets, key: Buffer) => ({
+    title: await decryptFieldWithSymmetricKey(secret.titleCiphertext, secret.titleIV, secret.titleTag, key),
+    type: await decryptFieldWithSymmetricKey(secret.typeCiphertext, secret.typeIV, secret.typeTag, key),
+    data: await decryptFieldWithSymmetricKey(secret.dataCiphertext, secret.dataIV, secret.dataTag, key),
+    comment: await decryptFieldWithSymmetricKey(secret.commentCiphertext, secret.commentIV, secret.commentTag, key)
   });
 
-  const findCustomerSecretById = async (id: string, orgId: string) => {
+  const findConsumerSecretById = async (id: string, orgId: string) => {
     const key = await getOrgBotKey(orgId);
-    const secret = await consumerSecretsDAL.findCustomerSecretById(id);
+    const secret = await consumerSecretsDAL.findConsumerSecretById(id);
     return {
-      ...secret,
-      ...decryptSecretFields(secret, key)
+      id: secret.id,
+      ...(await decryptSecretFields(secret, key))
     };
   };
 
@@ -93,31 +93,46 @@ export const consumerSecretsServiceFactory = ({ consumerSecretsDAL, orgBotDAL }:
     return consumerSecretsDAL.createConsumerSecret(encryptedData);
   };
 
-  const updateConsumerSecrets = async ({ id, title, type, data, comment, orgId, userId }: TUpdateConsumerSecretDTO) => {
+  const updateConsumerSecrets = async ({ id, title, type, data, comment, orgId }: TUpdateConsumerSecretDTO) => {
+    // check if the secret exists
+    const secret = await consumerSecretsDAL.findConsumerSecretById(id);
+    if (!secret) throw new BadRequestError({ message: "Secret not found", name: "SecretNotFound" });
+
+    if (!title && !type && !data && !comment) {
+      throw new BadRequestError({ message: "At least one field must be provided", name: "NoFieldsProvided" });
+    }
+
     const encryptionKey = await getOrgBotKey(orgId);
 
-    const titleEncrypted = encryptSymmetric128BitHexKeyUTF8(title, encryptionKey);
-    const typeEncrypted = encryptSymmetric128BitHexKeyUTF8(type, encryptionKey);
-    const dataEncrypted = encryptSymmetric128BitHexKeyUTF8(data, encryptionKey);
-    const commentEncrypted = encryptSymmetric128BitHexKeyUTF8(comment || "", encryptionKey);
+    const titleEncrypted = title ? encryptSymmetric128BitHexKeyUTF8(title, encryptionKey) : null;
+    const typeEncrypted = type ? encryptSymmetric128BitHexKeyUTF8(type, encryptionKey) : null;
+    const dataEncrypted = data ? encryptSymmetric128BitHexKeyUTF8(data, encryptionKey) : null;
+    const commentEncrypted = comment ? encryptSymmetric128BitHexKeyUTF8(comment, encryptionKey) : null;
 
     const encryptedData = {
-      id: uuidv4(),
-      userId,
-      titleCiphertext: titleEncrypted.ciphertext,
-      titleIV: titleEncrypted.iv,
-      titleTag: titleEncrypted.tag,
-      typeCiphertext: typeEncrypted.ciphertext,
-      typeIV: typeEncrypted.iv,
-      typeTag: typeEncrypted.tag,
-      dataCiphertext: dataEncrypted.ciphertext,
-      dataIV: dataEncrypted.iv,
-      dataTag: dataEncrypted.tag,
-      commentCiphertext: commentEncrypted.ciphertext,
-      commentIV: commentEncrypted.iv,
-      commentTag: commentEncrypted.tag
+      ...(titleEncrypted && {
+        titleCiphertext: titleEncrypted.ciphertext,
+        titleIV: titleEncrypted.iv,
+        titleTag: titleEncrypted.tag,
+      }),
+      ...(typeEncrypted && {
+        typeCiphertext: typeEncrypted.ciphertext,
+        typeIV: typeEncrypted.iv,
+        typeTag: typeEncrypted.tag,
+      }),
+      ...(dataEncrypted && {
+        dataCiphertext: dataEncrypted.ciphertext,
+        dataIV: dataEncrypted.iv,
+        dataTag: dataEncrypted.tag,
+      }),
+      ...(commentEncrypted && {
+        commentCiphertext: commentEncrypted.ciphertext,
+        commentIV: commentEncrypted.iv,
+        commentTag: commentEncrypted.tag,
+      }),
     };
-    return consumerSecretsDAL.upsertConsumerSecrets(encryptedData);
+
+    return consumerSecretsDAL.updateConsumerSecrets(id, encryptedData);
   };
 
   const deleteConsumerSecret = async (id: string) => {
@@ -125,7 +140,7 @@ export const consumerSecretsServiceFactory = ({ consumerSecretsDAL, orgBotDAL }:
   };
 
   return {
-    findCustomerSecretById,
+    findConsumerSecretById,
     findAllOrganizationCustomerSecrets,
     createConsumerSecret,
     updateConsumerSecrets,

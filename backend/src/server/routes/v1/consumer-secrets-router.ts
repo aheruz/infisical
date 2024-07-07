@@ -38,6 +38,32 @@ export const registerConsumerSecretsRouter = async (server: FastifyZodProvider) 
   });
 
   server.route({
+    method: "GET",
+    url: "/:id",
+    config: {
+      rateLimit: readLimit
+    },
+    schema: {
+      description: "Retrieve a specific consumer secret",
+      params: z.object({
+        id: z.string().describe(CONSUMER_SECRETS.GET.id)
+      }),
+      response: {
+        200: z.object({
+          id: z.string().describe(CONSUMER_SECRETS.GET.id),
+          title: z.string().describe(CONSUMER_SECRETS.GET.title),
+          type: z.string().describe(CONSUMER_SECRETS.GET.type),
+          data: z.string().describe(CONSUMER_SECRETS.GET.data),
+          comment: z.string().optional().describe(CONSUMER_SECRETS.GET.comment)
+        })
+      }
+    },
+    handler: async (req) => {
+      return await server.services.consumerSecrets.findConsumerSecretById(req.params.id, req.permission.orgId);
+    }
+  });
+
+  server.route({
     method: "POST",
     url: "/",
     config: {
@@ -104,14 +130,12 @@ export const registerConsumerSecretsRouter = async (server: FastifyZodProvider) 
     onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN]),
     handler: async (req) => {
       const { id } = req.params;
-      const { title, type, data, comment } = req.body;
-      const updates = { id, title, type, data, comment };
 
-      const updatedSecret = await server.services.consumerSecrets.updateConsumerSecrets(
-        updates,
-        req.permission.orgId,
-        req.permission.id
-      );
+      const updatedSecret = await server.services.consumerSecrets.updateConsumerSecrets({
+        id,
+        ...req.body,
+        orgId: req.permission.orgId
+      });
 
       return { id: updatedSecret.id };
     }

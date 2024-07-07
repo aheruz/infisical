@@ -1,7 +1,7 @@
 import { Knex } from "knex";
 
 import { TDbClient } from "@app/db";
-import { TableName, TConsumerSecrets, TConsumerSecretsInsert } from "@app/db/schemas";
+import { TableName, TConsumerSecrets, TConsumerSecretsInsert, TConsumerSecretsUpdate } from "@app/db/schemas";
 import { DatabaseError } from "@app/lib/errors";
 import { ormify, selectAllTableCols } from "@app/lib/knex";
 
@@ -10,7 +10,7 @@ export type TConsumerSecretsDALFactory = ReturnType<typeof consumerSecretsDALFac
 export const consumerSecretsDALFactory = (db: TDbClient) => {
   const consumerSecretsOrm = ormify(db, TableName.ConsumerSecrets);
 
-  const findCustomerSecretById = async (id: string, tx?: Knex): Promise<TConsumerSecrets> => {
+  const findConsumerSecretById = async (id: string, tx?: Knex): Promise<TConsumerSecrets> => {
     try {
       const secret = await (tx || db.replicaNode())(TableName.ConsumerSecrets).where({ id }).first();
       return secret;
@@ -43,12 +43,11 @@ export const consumerSecretsDALFactory = (db: TDbClient) => {
     }
   };
 
-  const upsertConsumerSecrets = async (data: TConsumerSecretsInsert, tx?: Knex) => {
+  const updateConsumerSecrets = async (id: string, data: TConsumerSecretsUpdate, tx?: Knex) => {
     try {
       const [secret] = await (tx || db)(TableName.ConsumerSecrets)
-        .insert(data)
-        .onConflict("id") // check for conflicts
-        .merge() // update the existing row on conflict
+        .where({ id })
+        .update(data)
         .returning("*");
       return secret;
     } catch (error) {
@@ -68,9 +67,9 @@ export const consumerSecretsDALFactory = (db: TDbClient) => {
   return {
     ...consumerSecretsOrm,
     createConsumerSecret,
-    findCustomerSecretById,
+    findConsumerSecretById,
     findAllOrganizationCustomerSecrets,
-    upsertConsumerSecrets,
+    updateConsumerSecrets,
     deleteConsumerSecret
   };
 };

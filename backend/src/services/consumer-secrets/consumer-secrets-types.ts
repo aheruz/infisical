@@ -8,10 +8,10 @@ export type TCreateConsumerSecretDTO = {
 };
 
 export type TUpdateConsumerSecretDTO = {
+  id: string;
   title?: string;
   type?: string;
   data?: string;
   comment?: string;
   orgId: string;
-  userId: string;
 };
