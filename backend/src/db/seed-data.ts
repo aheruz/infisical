@@ -8,13 +8,13 @@ import { encodeBase64 } from "tweetnacl-util";
 
 import {
   decryptAsymmetric,
-  // decryptAsymmetric,
   decryptSymmetric128BitHexKeyUTF8,
   encryptAsymmetric,
-  encryptSymmetric128BitHexKeyUTF8
+  encryptSymmetric128BitHexKeyUTF8,
+  generateAsymmetricKeyPair
 } from "@app/lib/crypto";
 
-import { TSecrets, TUserEncryptionKeys } from "./schemas";
+import { SecretEncryptionAlgo, SecretKeyEncoding, TSecrets, TUserEncryptionKeys } from "./schemas";
 
 export let userPrivateKey: string | undefined;
 export let userPublicKey: string | undefined;
@@ -113,6 +113,40 @@ export const generateUserSrpKeys = async (password: string) => {
     encryptedPrivateKeyTag,
     salt,
     verifier
+  };
+};
+
+export const generateOrgBotSrpKeys = async () => {
+  // generate asymmetric key pair
+  const { privateKey, publicKey } = generateAsymmetricKeyPair();
+  const key = process.env.ENCRYPTION_KEY as string;
+
+  // encrypt private key
+  const {
+    ciphertext: encryptedPrivateKey,
+    iv: privateKeyIV,
+    tag: privateKeyTag
+  } = encryptSymmetric128BitHexKeyUTF8(privateKey, key);
+
+  // encrypt public key
+  const {
+    ciphertext: encryptedPublicKey,
+    iv: publicKeyIV,
+    tag: publicKeyTag
+  } = encryptSymmetric128BitHexKeyUTF8(publicKey, key);
+  
+  return {
+    publicKey,  
+    encryptedPrivateKey,
+    privateKeyIV,
+    privateKeyTag,
+    privateKeyEncoding: SecretKeyEncoding.UTF8,
+    privateKeyAlgorithm: SecretEncryptionAlgo.AES_256_GCM,
+    encryptedPublicKey,
+    publicKeyIV,
+    publicKeyTag,
+    publicKeyEncoding: SecretKeyEncoding.UTF8,
+    publicKeyAlgorithm: SecretEncryptionAlgo.AES_256_GCM
   };
 };
 

@@ -1,12 +1,13 @@
 import { Knex } from "knex";
 
 import { OrgMembershipRole, OrgMembershipStatus, TableName } from "../schemas";
-import { seedData1 } from "../seed-data";
+import { generateOrgBotSrpKeys, seedData1 } from "../seed-data";
 
 export async function seed(knex: Knex): Promise<void> {
   // Deletes ALL existing entries
   await knex(TableName.Organization).del();
   await knex(TableName.OrgMembership).del();
+  await knex(TableName.OrgBot).del();
 
   const user = await knex(TableName.Users).where({ email: seedData1.email }).first();
   if (!user) throw new Error("User not found");
@@ -32,4 +33,34 @@ export async function seed(knex: Knex): Promise<void> {
       userId: user.id
     }
   ]);
+
+  const {
+    publicKey,
+    encryptedPrivateKey,
+    privateKeyIV,
+    privateKeyTag,
+    privateKeyEncoding,
+    privateKeyAlgorithm,
+    encryptedPublicKey,
+    publicKeyIV,
+    publicKeyTag,
+    publicKeyEncoding,
+    publicKeyAlgorithm
+  } = await generateOrgBotSrpKeys();
+
+  await knex(TableName.OrgBot).insert({
+    name: org.name,
+    orgId: org.id,
+    publicKey,
+    encryptedSymmetricKey: encryptedPublicKey,
+    symmetricKeyIV: publicKeyIV,
+    symmetricKeyTag: publicKeyTag,
+    symmetricKeyAlgorithm: publicKeyAlgorithm,
+    symmetricKeyKeyEncoding: publicKeyEncoding,
+    encryptedPrivateKey,
+    privateKeyIV,
+    privateKeyTag,
+    privateKeyAlgorithm,
+    privateKeyKeyEncoding: privateKeyEncoding
+  });
 }
