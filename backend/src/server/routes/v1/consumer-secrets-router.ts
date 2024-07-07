@@ -14,15 +14,12 @@ export const registerConsumerSecretsRouter = async (server: FastifyZodProvider) 
     },
     schema: {
       description: "Retrieve the list of saved consumer secrets",
-      querystring: z.object({
-        orgId: z.string().trim().describe(CONSUMER_SECRETS.GET.orgId)
-      }),
       response: {
         200: z.array(
           z.object({
             id: z.string().describe(CONSUMER_SECRETS.GET.id),
             userId: z.string().describe(CONSUMER_SECRETS.GET.userId),
-            organizationId: z.string().describe(CONSUMER_SECRETS.GET.organizationId),
+            orgId: z.string().describe(CONSUMER_SECRETS.GET.orgId),
             title: z.string().describe(CONSUMER_SECRETS.GET.title),
             type: z.string().describe(CONSUMER_SECRETS.GET.type),
             data: z.string().describe(CONSUMER_SECRETS.GET.data),
@@ -31,13 +28,12 @@ export const registerConsumerSecretsRouter = async (server: FastifyZodProvider) 
         )
       }
     },
-    onRequest: verifyAuth([AuthMode.JWT]),
+    onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN]),
     handler: async (req) => {
-      const secrets = await server.services.consumerSecrets.findAllOrganizationCustomerSecrets(
+      return await server.services.consumerSecrets.findAllOrganizationCustomerSecrets(
         req.permission.orgId,
         req.permission.id
       );
-      return { secrets };
     }
   });
 
@@ -66,7 +62,7 @@ export const registerConsumerSecretsRouter = async (server: FastifyZodProvider) 
         })
       }
     },
-    onRequest: verifyAuth([AuthMode.JWT]),
+    onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN], ),
     handler: async (req) => {
       const { title, type, data, comment } = req.body;
       const newSecret = await server.services.consumerSecrets.createConsumerSecret({
@@ -105,13 +101,13 @@ export const registerConsumerSecretsRouter = async (server: FastifyZodProvider) 
         })
       }
     },
-    onRequest: verifyAuth([AuthMode.JWT]),
+    onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN]),
     handler: async (req) => {
       const { id } = req.params;
       const { title, type, data, comment } = req.body;
       const updates = { id, title, type, data, comment };
 
-      const updatedSecret = await server.services.consumerSecrets.upsertConsumerSecrets(
+      const updatedSecret = await server.services.consumerSecrets.updateConsumerSecrets(
         updates,
         req.permission.orgId,
         req.permission.id
@@ -138,7 +134,7 @@ export const registerConsumerSecretsRouter = async (server: FastifyZodProvider) 
         })
       }
     },
-    onRequest: verifyAuth([AuthMode.JWT]),
+    onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN]),
     handler: async (req) => {
       const { id } = req.params;
       await server.services.consumerSecrets.deleteConsumerSecret(id);

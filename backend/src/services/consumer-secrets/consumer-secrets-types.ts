@@ -7,10 +7,11 @@ export type TCreateConsumerSecretDTO = {
   comment?: string;
 };
 
-export type TUpdateConsumerSecret = {
-  id: string;
+export type TUpdateConsumerSecretDTO = {
   title?: string;
   type?: string;
   data?: string;
   comment?: string;
+  orgId: string;
+  userId: string;
 };

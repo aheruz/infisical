@@ -1,7 +1,7 @@
 import { Knex } from "knex";
 
 import { TDbClient } from "@app/db";
-import { TableName, TConsumerSecretsInsert } from "@app/db/schemas";
+import { TableName, TConsumerSecrets, TConsumerSecretsInsert } from "@app/db/schemas";
 import { DatabaseError } from "@app/lib/errors";
 import { ormify, selectAllTableCols } from "@app/lib/knex";
 
@@ -10,7 +10,7 @@ export type TConsumerSecretsDALFactory = ReturnType<typeof consumerSecretsDALFac
 export const consumerSecretsDALFactory = (db: TDbClient) => {
   const consumerSecretsOrm = ormify(db, TableName.ConsumerSecrets);
 
-  const findCustomerSecretById = async (id: string, tx?: Knex) => {
+  const findCustomerSecretById = async (id: string, tx?: Knex): Promise<TConsumerSecrets> => {
     try {
       const secret = await (tx || db.replicaNode())(TableName.ConsumerSecrets).where({ id }).first();
       return secret;

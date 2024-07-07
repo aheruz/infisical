@@ -31,40 +31,37 @@ const createConsumerSecret = async (dto: { title: string; type: string; data: st
 // };
 
 describe("Consumer Secrets Router", async () => {
-  test.each([
-    { title: "secret1", type: "type1", data: "data1" },
-    { title: "secret2", type: "type2", data: "data2", comment: "comment2" }
-  ])("Create consumer secret $title", async ({ title, type, data, comment }) => {
-    const createdSecretId = await createConsumerSecret({ title, type, data, comment });
-    expect(createdSecretId).toEqual(expect.any(String));
-    // await deleteConsumerSecret(createdSecretId);
-  });
+    test.each([
+        { title: "secret1", type: "type1", data: "data1" },
+        { title: "secret2", type: "type2", data: "data2", comment: "comment2" }
+    ])("Create consumer secret $title", async ({ title, type, data, comment }) => {
+        const createdSecretId = await createConsumerSecret({ title, type, data, comment });
+        expect(createdSecretId).toEqual(expect.any(String));
+        // await deleteConsumerSecret(createdSecretId);
+    });
+
+    test("Get consumer secrets", async () => {
+      const createdSecretIds = await Promise.all([
+        createConsumerSecret({ title: "secret1", type: "type1", data: "data1" }),
+        createConsumerSecret({ title: "secret2", type: "type2", data: "data2", comment: "comment2" })
+      ]);
+  
+      const res = await testServer.inject({
+        method: "GET",
+        url: `/api/v1/consumer-secrets`,
+        headers: {
+          authorization: `Bearer ${jwtAuthToken}`
+        }
+      });
+
+      expect(res.statusCode).toBe(200);
+      const payload = JSON.parse(res.payload);
+      expect(payload.length).toBeGreaterThanOrEqual(2);
+  
+    //   await Promise.all(createdSecretIds.map(id => deleteConsumerSecret(id)));
+    });
 });
 
-//   test("Get consumer secrets", async () => {
-//     const createdSecretIds = await Promise.all([
-//       createConsumerSecret({ title: "secret1", type: "type1", data: "data1" }),
-//       createConsumerSecret({ title: "secret2", type: "type2", data: "data2", comment: "comment2" })
-//     ]);
-
-//     const res = await testServer.inject({
-//       method: "GET",
-//       url: `/api/v1/consumer-secrets`,
-//       headers: {
-//         authorization: `Bearer ${jwtAuthToken}`
-//       },
-//       query: {
-//         orgId: seedData1.project.id
-//       }
-//     });
-
-//     expect(res.statusCode).toBe(200);
-//     const payload = JSON.parse(res.payload);
-//     expect(payload).toHaveProperty("secrets");
-//     expect(payload.secrets.length).toBeGreaterThanOrEqual(2);
-
-//     await Promise.all(createdSecretIds.map(id => deleteConsumerSecret(id)));
-//   });
 
 //   test("Update a consumer secret", async () => {
 //     const createdSecretId = await createConsumerSecret({ title: "secret-to-update", type: "type1", data: "data1" });
