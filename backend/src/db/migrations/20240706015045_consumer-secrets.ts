@@ -25,7 +25,7 @@ export async function up(knex: Knex): Promise<void> {
             // encryption settings
             table.string("algorithm").notNullable().defaultTo(SecretEncryptionAlgo.AES_256_GCM);
             table.string("keyEncoding").notNullable().defaultTo(SecretKeyEncoding.UTF8);
-            table.timestamps(true, true);
+            table.timestamps(true, true, true);
             // foreign keys
             table.foreign("userId").references("id").inTable(TableName.Users).onDelete("CASCADE");
             table.foreign("orgId").references("id").inTable(TableName.Organization).onDelete("CASCADE");

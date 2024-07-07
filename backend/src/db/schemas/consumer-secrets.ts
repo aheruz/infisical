@@ -26,8 +26,9 @@ export const ConsumerSecretsSchema = z.object({
   commentIV: z.string(),
   commentTag: z.string(),
   algorithm: z.string().default('aes-256-gcm'),
-  created_at: z.date(),
-  updated_at: z.date()
+  keyEncoding: z.string().default('utf8'),
+  createdAt: z.date(),
+  updatedAt: z.date()
 });
 
 export type TConsumerSecrets = z.infer<typeof ConsumerSecretsSchema>;

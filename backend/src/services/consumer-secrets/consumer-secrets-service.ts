@@ -6,6 +6,7 @@ import { SecretKeyEncoding } from "@app/db/schemas";
 import { BadRequestError } from "@app/lib/errors";
 import { infisicalSymmetricDecrypt } from "@app/lib/crypto/encryption";
 import { TCreateConsumerSecret } from "./consumer-secrets-types";
+import { v4 as uuidv4 } from "uuid";
 
 type TConsumerSecretsServiceFactoryDep = {
   consumerSecretsDAL: TConsumerSecretsDALFactory;
@@ -15,18 +16,20 @@ type TConsumerSecretsServiceFactoryDep = {
 export type TConsumerSecretsServiceFactory = ReturnType<typeof consumerSecretsServiceFactory>;
 
 export const consumerSecretsServiceFactory = ({ consumerSecretsDAL, orgBotDAL }: TConsumerSecretsServiceFactoryDep) => {
-  const getOrgBotKey = async (orgId: string) => {
+  const getOrgBotKey = async (orgId: string): Promise<Buffer> => {
     const orgBot = await orgBotDAL.findOne({ orgId });
     if (!orgBot) {
       throw new BadRequestError({ message: "Org bot not found", name: "OrgBotNotFound" });
     }
 
-    return infisicalSymmetricDecrypt({
+    const encryptionKey = infisicalSymmetricDecrypt({
       ciphertext: orgBot.encryptedSymmetricKey,
       iv: orgBot.symmetricKeyIV,
       tag: orgBot.symmetricKeyTag,
       keyEncoding: orgBot.symmetricKeyKeyEncoding as SecretKeyEncoding
     });
+
+    return Buffer.from(encryptionKey, SecretKeyEncoding.BASE64);
   };
 
   const decryptFieldWithSymmetricKey = async (ciphertext: string, iv: string, tag: string, key: string) => {
@@ -66,10 +69,9 @@ export const consumerSecretsServiceFactory = ({ consumerSecretsDAL, orgBotDAL }:
     userId
   }: TCreateConsumerSecret) => {
     const encryptionKey = await getOrgBotKey(orgId);
-
     const titleEncrypted = encryptSymmetric128BitHexKeyUTF8(title, encryptionKey);
     const typeEncrypted = encryptSymmetric128BitHexKeyUTF8(type, encryptionKey);
-    const dataEncrypted = encryptSymmetric128BitHexKeyUTF8(JSON.stringify(data), encryptionKey);
+    const dataEncrypted = encryptSymmetric128BitHexKeyUTF8(data, encryptionKey);
     const commentEncrypted = encryptSymmetric128BitHexKeyUTF8(comment || "", encryptionKey);
 
     const encryptedData = {
@@ -89,6 +91,8 @@ export const consumerSecretsServiceFactory = ({ consumerSecretsDAL, orgBotDAL }:
       commentTag: commentEncrypted.tag
     };
 
+    console.log("encryptedData", encryptedData);
+
     return consumerSecretsDAL.upsertConsumerSecrets(encryptedData);
   };
 
@@ -101,7 +105,7 @@ export const consumerSecretsServiceFactory = ({ consumerSecretsDAL, orgBotDAL }:
     const commentEncrypted = encryptSymmetric128BitHexKeyUTF8(data.comment || "", encryptionKey);
 
     const encryptedData = {
-      ...data,
+      id: uuidv4(),
       userId,
       titleCiphertext: titleEncrypted.ciphertext,
       titleIV: titleEncrypted.iv,

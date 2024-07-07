@@ -1,6 +1,6 @@
 import { Knex } from "knex";
 import { TDbClient } from "@app/db";
-import { TableName, TConsumerSecrets, TConsumerSecretsUpdate } from "@app/db/schemas";
+import { TableName, TConsumerSecretsInsert } from "@app/db/schemas";
 import { DatabaseError } from "@app/lib/errors";
 import { ormify, selectAllTableCols } from "@app/lib/knex";
 
@@ -33,7 +33,7 @@ export const consumerSecretsDALFactory = (db: TDbClient) => {
     }
   };
 
-  const upsertConsumerSecrets = async (data: TConsumerSecrets, tx?: Knex) => {
+  const upsertConsumerSecrets = async (data: TConsumerSecretsInsert, tx?: Knex) => {
     try {
       const [secret] = await (tx || db)(TableName.ConsumerSecrets)
         .insert(data)

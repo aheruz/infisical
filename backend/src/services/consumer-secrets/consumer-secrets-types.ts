@@ -1,7 +1,7 @@
 export type TCreateConsumerSecret = {
   title: string;
   type: string;
-  data: Record<string, any>;
+  data: string;
   orgId: string;
   userId: string;
   comment?: string;
