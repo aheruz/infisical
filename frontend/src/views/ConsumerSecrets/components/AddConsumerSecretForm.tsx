@@ -63,6 +63,7 @@ export const AddConsumerSecretForm = ({
                 <Controller
                     control={control}
                     name={field.name}
+                    defaultValue="" // Ensure default value is provided
                     render={({ field: controllerField }) => (
                         <Input {...controllerField} type={field.type} disabled={isInputDisabled} />
                     )}

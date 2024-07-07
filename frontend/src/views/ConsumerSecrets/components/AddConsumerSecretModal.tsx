@@ -14,15 +14,13 @@ type Props = {
     popUpName: keyof UsePopUpState<ConsumerSecretType[]>,
     state?: boolean
   ) => void;
-  isPublic: boolean;
-  inModal: boolean;
 };
 
-export const AddConsumerSecretModal = ({ popUp, handlePopUpToggle, isPublic, inModal }: Props) => {
+export const AddConsumerSecretModal = ({ popUp, handlePopUpToggle }: Props) => {
 
-  const openPopUpKey = Object.keys(popUp).find(
-    (key): key is keyof UsePopUpState<ConsumerSecretType[]> => popUp[key as keyof UsePopUpState<ConsumerSecretType[]>].isOpen
-  );
+    const openPopUpKey = Object.keys(popUp).find(
+        (key): key is keyof UsePopUpState<ConsumerSecretType[]> => popUp[key as keyof UsePopUpState<ConsumerSecretType[]>].isOpen
+    );
 
   const getConfigAndSchema = (key: keyof UsePopUpState<ConsumerSecretType[]>) => {
     const config = credentialConfig[key as keyof typeof credentialConfig];
@@ -32,6 +30,7 @@ export const AddConsumerSecretModal = ({ popUp, handlePopUpToggle, isPublic, inM
 
   // validate required data
   if (!openPopUpKey) return null;
+  if (!(openPopUpKey in credentialConfig)) return null;
   const { config, schema } = getConfigAndSchema(openPopUpKey);
   if (!schema) return null;
 
