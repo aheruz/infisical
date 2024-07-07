@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconButton, Td, Tr } from "@app/components/v2";
 import { TDecryptedConsumerSecret } from "@app/hooks/api/consumerSecrets/types";
 import { UsePopUpState } from "@app/hooks/usePopUp";
+import { credentialConfig } from "./CredentialConfig";
 
 const formatDate = (date: Date): string => (date ? new Date(date).toUTCString() : "");
 
@@ -100,9 +101,9 @@ export const ConsumerSecretsRow = ({
 
   return (
     <Tr key={row.id}>
-      <Td>{row.title}</Td>
-      <Td>{row.type}</Td>
-      <Td>{row.comment}</Td>
+      <Td>{row.title.length > 20 ? row.title.slice(0, 20) + "..." : row.title}</Td>
+      <Td>{(credentialConfig[row.type]?.title || row.type).toUpperCase()}</Td>
+      <Td>{row.comment.length > 50 ? row.comment.slice(0, 50) + "..." : row.comment}</Td>
       <Td>
         <IconButton
             onClick={() =>
