@@ -2,7 +2,7 @@ import Link from "next/link";
 import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-// import { ShareSecretSection } from "./components";
+import { ConsumerSecretsSection } from "./components";
 
 export const ConsumerSecretsPage = () => {
   return (
@@ -10,7 +10,7 @@ export const ConsumerSecretsPage = () => {
       <div className="flex items-center justify-between py-6">
         <div className="flex w-full flex-col">
           <h2 className="text-3xl font-semibold text-gray-2000">Consumer Secrets</h2>
-          <p className="text-bunker-300">Manage your consumer secrets</p>
+          <p className="text-bunker-300">Manage your organizational secrets</p>
         </div>
         <div className="flex w-max justify-center">
           <Link href="https://infisical.com/docs/documentation/platform/consumer-secrets" passHref>
@@ -26,7 +26,7 @@ export const ConsumerSecretsPage = () => {
           </Link>
         </div>
       </div>
-      {/* <ShareSecretSection /> */}
+      <ConsumerSecretsSection />
     </div>
   );
 };

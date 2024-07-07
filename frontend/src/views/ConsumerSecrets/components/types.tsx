@@ -1,0 +1,1 @@
+export type ConsumerSecretType = "weblogin" | "creditcard" | "securenote";
