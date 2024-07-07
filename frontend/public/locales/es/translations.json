@@ -107,6 +107,11 @@
       }
     }
   },
+  "consumer-secrets": {
+    "title": "Datos Confidenciales",
+    "og-title": "Administra tus datos confidenciales",
+    "og-description": "Infisical es una plataforma cifrada para sincronizar y gestionar archivos .env."
+  },
   "integrations": {
     "title": "Integraciones del proyecto",
     "description": "Gestiona tus integraciones de Infisical con aplicaciones de terceros.",
