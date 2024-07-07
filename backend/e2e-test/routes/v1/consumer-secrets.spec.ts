@@ -18,17 +18,17 @@ const createConsumerSecret = async (dto: { title: string; type: string; data: st
   return res.json().id;
 };
 
-// const deleteConsumerSecret = async (id: string) => {
-//   const res = await testServer.inject({
-//     method: "DELETE",
-//     url: `/api/v1/consumer-secrets/${id}`,
-//     headers: {
-//       authorization: `Bearer ${jwtAuthToken}`
-//     }
-//   });
-//   expect(res.statusCode).toBe(200);
-//   return res.json().id;
-// };
+const deleteConsumerSecret = async (id: string) => {
+  const res = await testServer.inject({
+    method: "DELETE",
+    url: `/api/v1/consumer-secrets/${id}`,
+    headers: {
+      authorization: `Bearer ${jwtAuthToken}`
+    }
+  });
+  expect(res.statusCode).toBe(204);
+  expect(res.body).toEqual("");
+};
 
 describe("Consumer Secrets Router", async () => {
     test.each([
@@ -37,7 +37,7 @@ describe("Consumer Secrets Router", async () => {
     ])("Create consumer secret $title", async ({ title, type, data, comment }) => {
         const createdSecretId = await createConsumerSecret({ title, type, data, comment });
         expect(createdSecretId).toEqual(expect.any(String));
-        // await deleteConsumerSecret(createdSecretId);
+        await deleteConsumerSecret(createdSecretId);
     });
 
     test("Get consumer secrets", async () => {
@@ -58,7 +58,7 @@ describe("Consumer Secrets Router", async () => {
       const payload = JSON.parse(res.payload);
       expect(payload.length).toBeGreaterThanOrEqual(2);
   
-    //   await Promise.all(createdSecretIds.map(id => deleteConsumerSecret(id)));
+      await Promise.all(createdSecretIds.map(id => deleteConsumerSecret(id)));
     });
 });
 
