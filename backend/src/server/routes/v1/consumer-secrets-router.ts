@@ -129,16 +129,14 @@ export const registerConsumerSecretsRouter = async (server: FastifyZodProvider) 
         id: z.string().describe(CONSUMER_SECRETS.DELETE.id)
       }),
       response: {
-        200: z.object({
-          id: z.string().describe(CONSUMER_SECRETS.DELETE.id)
-        })
+        204: z.void()
       }
     },
     onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN]),
-    handler: async (req) => {
+    handler: async (req, res) => {
       const { id } = req.params;
       await server.services.consumerSecrets.deleteConsumerSecret(id);
-      return { id };
+      res.status(204).send();
     }
   });
 };
